@@ -74,3 +74,56 @@ def add_item(lst, item):
 nums = [1, 2]
 add_item(nums, 3)
 print(nums)                 # [1, 2, 3]
+
+
+
+# ============================================================
+# Mutability vs Immutability (Python)
+# ============================================================
+
+# "Change in place" means:
+# The object stays in the same memory location,
+# but its contents are modified.
+# No new object is created.
+
+# ----- Mutable example -----
+a = [1, 2]
+b = a              # a and b point to the same list object
+a.append(3)        # list changes IN PLACE
+
+print(a)  # [1, 2, 3]
+print(b)  # [1, 2, 3]
+
+# The list object stayed the same; its contents changed.
+
+
+# ----- Immutable example -----
+a = 10
+b = a              # a and b point to the same int object
+a = a + 1          # creates a NEW int object (11)
+
+print(a)  # 11
+print(b)  # 10
+
+# The int object 10 was never modified.
+# a was rebound to a new object.
+
+
+# ----- Key rules -----
+# Mutation changes an object.
+# Rebinding changes what a variable points to.
+#
+# Mutable objects:
+# - list
+# - dict
+# - set
+# - bytearray
+#
+# Immutable objects:
+# - int
+# - float
+# - bool
+# - str
+# - tuple
+# - bytes
+# - frozenset

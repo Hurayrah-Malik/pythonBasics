@@ -29,7 +29,8 @@
 
 
 # BAD: mutable default argument (shared across calls)
-# remember: default arguments are evaluated ONCE, when the function is defined, and lists are mutable, therefore it keeps growing
+# remember: default arguments are evaluated ONCE, when the function is defined, and lists are mutable,
+# therefore it keeps growing
 def bad_add(item, lst=[]):
     lst.append(item)
     return lst
