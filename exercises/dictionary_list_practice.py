@@ -28,12 +28,13 @@ def main() -> None:
 
 
 #coutns the stores the duplicates, unique values, and occurances
-def combined_function(items: list[Hashable]) -> dict[str, Any]:
+def combined_function(items: list[Hashable]) -> dict[str, object]:
     duplicates: list[Hashable] = []
     seen: set[Hashable] = set()
     unique_values: list[Hashable] = []
     counts: dict[Hashable, int] = {}
     for item in items:
+        # the 0 means that if the item spefcied is not in the dictionary, then 0 will be set default value
         counts[item] = counts.get(item, 0) + 1
         if item not in seen:
             seen.add(item)
