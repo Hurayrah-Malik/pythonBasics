@@ -1,0 +1,3 @@
+[tool.ruff]
+select = ["F", "E7", "E9", "W6"]
+ignore = []
