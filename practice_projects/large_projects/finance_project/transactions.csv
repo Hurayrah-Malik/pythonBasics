@@ -1,0 +1,15 @@
+date,description,amount,category
+2026-01-02,Starbucks,-5.43,Food
+2026-01-02,Amazon,-129.99,Shopping
+2026-01-03,Paycheck,2500.00,Income
+2026-01-05,Rent,-1200.00,Housing
+2026-01-06,Gas Station,-42.10,Transport
+2026-01-07,Refund Amazon,29.99,Shopping
+2026-01-08,Unknown Merchant,-10.00,
+2026-01-09,Netflix,-15.49,Entertainment
+2026-01-10,Target,xx.yy,Shopping
+2026-01-11,Coffee,-3.5,Food
+2026-01-12,Bad Row Missing Amount,,Food
+2026-01-13,Too Many Decimals,-1.999,Food
+2026-01-14,Positive Spending Typo,12.34,Food
+2026-01-15,Negative Income Typo,-2000.00,Income
