@@ -114,8 +114,16 @@ def main() -> None:
     income_cents = income_and_spending["total_income"]
     spending_cents = income_and_spending["total_spending"]
 
+    # calculate the net
+    net_income = net_cents(income_cents, spending_cents)
+
     print(f"total income in cents: {income_cents}")
     print(f"total spending in cents: {spending_cents}")
+    print(f"net income: {net_income}")
+
+    # print the spending by category
+    category_spending = spending_by_category(clean)
+    print(f"spending by category: {category_spending}")
 
 
 # read the csv and output a list of all rows
@@ -171,6 +179,27 @@ def check_amount_symbol(row: dict) -> None:
     return
 
 
+# get the 3 top spendings
+
+
+# calculate the spending according to category
+def spending_by_category(rows: list) -> dict:
+    category_spending = {}
+    for row in rows:
+
+        category = row["category"]
+        amount = row["amount"]
+        # if the category is income, then skip it
+        if category == "Income":
+            continue
+        if category_spending.get(category):
+            category_spending[category] += amount
+        else:
+            category_spending[category] = amount
+
+    return category_spending
+
+
 # calculate the total income and the spending amount
 def compute_income_and_spending(clean_rows: list) -> dict:
 
@@ -189,6 +218,10 @@ def compute_income_and_spending(clean_rows: list) -> dict:
     income_and_spending["total_spending"] = -income_and_spending["total_spending"]
 
     return income_and_spending
+
+
+def net_cents(income: int, spending: int) -> int:
+    return income - spending
 
 
 # convert dollars to pennies
