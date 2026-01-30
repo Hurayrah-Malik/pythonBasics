@@ -3,7 +3,6 @@ Python Study Notes — Modules (imports, sys.modules, __name__ == "__main__")
 
 Short explanations. Examples include expected outputs.
 
-Based on lecture notes in: CS 2 notes.pdf :contentReference[oaicite:0]{index=0}
 
 Core ideas:
 - A module is a .py file.
@@ -77,8 +76,7 @@ Precise version:
 - After that, importing again reuses the cached module from sys.modules,
   so top-level code is NOT executed again in the same process.
 
-This matches the image on page 1: importing one/two/three causes their top-level
-print statements to run. :contentReference[oaicite:1]{index=1}
+
 """
 
 # NOTE: The following is "multi-file" behavior. You would create these files:
@@ -144,17 +142,119 @@ print(root(9))  # 3.0
 # ============================================================
 
 """
-Your note (page 2):
-- If a file has `if __name__ == "__main__":`, it's a hint it's designed to run as a script.
-- If it doesn't, it's a hint it's meant to be imported as a module.
+============================================================
+__name__ == "__main__" — FULL EXPLANATION (NOTES)
+============================================================
 
-Precise model:
-- Every module has a global variable named __name__.
-- If the file is RUN directly:      __name__ == "__main__"
-- If the file is IMPORTED:          __name__ == "module_name"
+Core fact:
+----------
+Every Python file is a *module*. When Python loads a module, it automatically
+sets a global variable called:
 
-This matches the screenshot on page 1 with main.py and module.py. :contentReference[oaicite:2]{index=2}
+    __name__
+
+What value __name__ gets depends on *how* the file is used.
+
+------------------------------------------------------------
+CASE 1: File is run directly (as a script)
+------------------------------------------------------------
+
+Command:
+    python mainFile.py
+
+Python sets:
+    __name__ = "__main__"
+
+So this condition is TRUE:
+    if __name__ == "__main__":
+
+Meaning:
+- This file is the program entry point
+- Code inside the guard should run automatically
+
+Example:
+    def main():
+        print("program logic")
+
+    if __name__ == "__main__":
+        main()     # runs automatically when file is executed
+
+------------------------------------------------------------
+CASE 2: File is imported (as a module)
+------------------------------------------------------------
+
+Code:
+    import mainFile
+
+Python sets:
+    __name__ = "mainFile"
+
+So this condition is FALSE:
+    if __name__ == "__main__":
+
+Meaning:
+- The file is being used by another file
+- Guarded code does NOT run automatically
+
+IMPORTANT:
+- The file is still imported
+- All functions and variables are defined
+- Nothing inside the guard executes
+
+------------------------------------------------------------
+WHY YOU CAN STILL CALL mainFile.main()
+------------------------------------------------------------
+
+The guard does NOT:
+- prevent importing
+- hide functions
+- block function calls
+
+It ONLY prevents *automatic execution at import time*.
+
+Example:
+    import mainFile
+    mainFile.main()   # this WILL run
+
+This is intentional.
+If you explicitly call a function, Python assumes you meant to.
+
+------------------------------------------------------------
+WHAT PROBLEM THIS SOLVES
+------------------------------------------------------------
+
+Without the guard:
+
+    print("program logic")
+
+This would run:
+- when the file is executed
+- when the file is imported   ❌ (bad side effect)
+
+With the guard:
+- Runs only when intended
+- Imports stay clean and safe
+
+------------------------------------------------------------
+PROFESSIONAL RULE
+------------------------------------------------------------
+
+- Any file with program flow, I/O, or execution logic:
+      USE if __name__ == "__main__"
+
+- Helper / utility modules:
+      Optional, but still acceptable
+
+------------------------------------------------------------
+ONE-SENTENCE SUMMARY
+------------------------------------------------------------
+
+(if __name__ == "__main__") does NOT stop imports —
+it stops code from running automatically when a file is imported.
+
+============================================================
 """
+
 
 # Multi-file example matching your lecture screenshot:
 #
@@ -210,35 +310,119 @@ Fix:
 - Put runnable code behind:
     if __name__ == "__main__":
 
-Footgun B: Circular imports
-- Example: a imports b, and b imports a.
-- Often caused by top-level imports + top-level execution that depends on each other.
-Fix:
-- Move imports inside functions (when appropriate)
-- Refactor shared code into a third module
-
-Footgun C: "from module import name" copies a reference at import time
-- If module.name later changes, your imported name might not reflect it.
-- Prefer: import module; use module.name
-"""
-
-
-# ============================================================
-# 6) Micro-exercises (quick checks)
-# ============================================================
 
 """
-Exercise 1:
-- Create a file helpers.py with: print("helpers loaded")
-- In main.py, import helpers twice.
-Question:
-- How many times does "helpers loaded" print, and why? (sys.modules)
 
-Exercise 2:
-- In helpers.py, add:
-    if __name__ == "__main__":
-        print("helpers running as script")
-- Run helpers.py directly vs import it.
-Question:
-- Which lines print in each case, and why? (__name__)
+"""
+============================================================
+IMPORTING FUNCTIONS FROM MODULES — HOW IT REALLY WORKS
+============================================================
+
+Scenario:
+---------
+You have two files:
+
+    mainFile.py
+    moduleOne.py
+
+`moduleOne.py` contains a function:
+
+    def hello():
+        print("hello")
+
+------------------------------------------------------------
+CASE 1: Standard import (MOST COMMON / RECOMMENDED)
+------------------------------------------------------------
+
+In mainFile.py:
+    import moduleOne
+
+How to call the function:
+    moduleOne.hello()
+
+Why this works:
+- The entire module is imported
+- `hello` lives inside the `moduleOne` namespace
+- You must qualify it with `moduleOne.`
+
+Why this is good practice:
+- Very explicit
+- Avoids name collisions
+- Makes it obvious where functions come from
+- Most common in professional codebases
+
+------------------------------------------------------------
+CASE 2: Import the function directly
+------------------------------------------------------------
+
+In mainFile.py:
+    from moduleOne import hello
+
+How to call the function:
+    hello()
+
+What this does:
+- Copies `hello` into the current file’s namespace
+- You no longer need `moduleOne.`
+
+Tradeoff:
+- Shorter
+- But easier to accidentally shadow names
+- Slightly less explicit
+
+------------------------------------------------------------
+CASE 3: Import everything (DO NOT USE)
+------------------------------------------------------------
+
+In mainFile.py:
+    from moduleOne import *
+
+How to call the function:
+    hello()
+
+Why this is bad:
+- You don’t know where names come from
+- Easy to overwrite variables
+- Makes code harder to read and debug
+- Generally rejected in industry code
+
+------------------------------------------------------------
+IMPORTANT RULE (VERY IMPORTANT)
+------------------------------------------------------------
+
+You CANNOT do this:
+    hello()
+
+Unless you explicitly imported `hello` into the file.
+
+This WILL NOT work:
+    import moduleOne
+    hello()          # NameError
+
+This WILL work:
+    import moduleOne
+    moduleOne.hello()
+
+------------------------------------------------------------
+RULE OF THUMB
+------------------------------------------------------------
+
+- Default choice:
+      import moduleOne
+      moduleOne.hello()
+
+- Acceptable for small, stable helpers:
+      from moduleOne import hello
+
+- Never:
+      from moduleOne import *
+
+------------------------------------------------------------
+ONE-SENTENCE SUMMARY
+------------------------------------------------------------
+
+Functions live inside their module’s namespace unless you explicitly
+import them into the current file.
+
+============================================================
 """
